@@ -22,23 +22,22 @@ const { NotImplementedError } = require('../extensions/index.js');
 class VigenereCipheringMachine {
   constructor(type = true) {
     this.type = type;
+    this.letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+    this.matrix = [];
+
+    const currentLetters = this.letters.slice();   
+
+    for (let i = 0; i < 26; i++) {
+      this.matrix[i] = currentLetters.slice();
+      const l0 = currentLetters.shift();
+      currentLetters.push(l0);
+    }
   }
 
   encrypt(message, key) {
     if (!message || !key) {
       throw new Error('Incorrect arguments!');
-    }
-
-    const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-    const currentLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                          'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-    const matrix = [];
-    
-    for (let i = 0; i < 26; i++) {
-      matrix[i] = currentLetters.slice();
-      const l0 = currentLetters.shift();
-      currentLetters.push(l0);
     }
 
     message = message.toUpperCase();
@@ -47,12 +46,12 @@ class VigenereCipheringMachine {
 
     let targetArr = [];
     for (let i = 0; i < message.length; i++) {
-      const mesIdx = letters.findIndex((item) => item === message[i]);
+      const mesIdx = this.letters.findIndex((item) => item === message[i]);
 
       if (mesIdx >= 0) {
         // шифруем
-        const keyIdx = letters.findIndex((item) => item === key[currKeyPosition]);
-        targetArr.push(matrix[mesIdx][keyIdx]);
+        const keyIdx = this.letters.findIndex((item) => item === key[currKeyPosition]);
+        targetArr.push(this.matrix[mesIdx][keyIdx]);
         currKeyPosition++;
         if (currKeyPosition === key.length) {
           currKeyPosition = 0;
@@ -75,30 +74,18 @@ class VigenereCipheringMachine {
       throw new Error('Incorrect arguments!');
     }
 
-    const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-    const currentLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                          'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-    const matrix = [];
-
-    for (let i = 0; i < 26; i++) {
-      matrix[i] = currentLetters.slice();
-      const l0 = currentLetters.shift();
-      currentLetters.push(l0);
-    }
-
     encryptedMessage = encryptedMessage.toUpperCase();
     key = key.toUpperCase();
     let currKeyPosition = 0;
 
     let targetArr = [];
     for (let i = 0; i < encryptedMessage.length; i++) {
-      const keyIdx = letters.findIndex((item) => item === key[currKeyPosition]);
-      const charIdx = matrix[keyIdx].findIndex((item) => item === encryptedMessage[i]);
+      const keyIdx = this.letters.findIndex((item) => item === key[currKeyPosition]);
+      const charIdx = this.matrix[keyIdx].findIndex((item) => item === encryptedMessage[i]);
 
       if (charIdx >= 0) {
         // расшифровываем
-        const mesLetter = letters[charIdx];
+        const mesLetter = this.letters[charIdx];
         targetArr.push(mesLetter);
         currKeyPosition++;
         if (currKeyPosition === key.length) {
